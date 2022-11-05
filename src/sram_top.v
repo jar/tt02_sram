@@ -2,7 +2,7 @@ module jar_sram_top
 # (
 	parameter AW = 4, // address width
 	parameter DW = 8, // data width
-	parameter DEPTH = 1 << AW // number of bytes
+	parameter DEPTH = 8 // number of bytes
 )
 (
 	input [DW-1:0] io_in,
@@ -24,6 +24,8 @@ module jar_sram_top
 	reg [DW-1:0] data_tmp;
 	reg [DW-1:0] mem [DEPTH];
 
+	wire [2:0] addr = addr_data[2:0];
+
 	always @(posedge clk) begin
 		if (rst) begin
 			cnt <= 0;
@@ -40,14 +42,14 @@ module jar_sram_top
 					cnt <= cnt + 1;
 				end
 				2'b10: begin
-					mem[addr_data] <= data_tmp;
+					mem[addr] <= data_tmp;
 					cnt <= 0;
 				end
 				default:;
 			endcase
 		end
 		else if (read) begin
-			data_tmp <= mem[addr_data];
+			data_tmp <= mem[addr];
 		end
 	end
 
