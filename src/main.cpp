@@ -65,6 +65,7 @@ int main(int argc, char* argv[])
 	}
 	io_in->oe = 0;
 
+#if 0
 	// Enable Streaming Output
 	io_in->oe = 1;
 	io_in->we = 1;
@@ -75,6 +76,7 @@ int main(int argc, char* argv[])
 		if (sram->io_out != val) err = 1;
 		tock();
 	}
+#endif
 
 	sram->final();
 	delete sram;

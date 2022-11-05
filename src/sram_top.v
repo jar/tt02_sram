@@ -19,9 +19,8 @@ module jar_sram_top
 	// Modes
 	wire write  = !oe &  we;
 	wire read   =  oe & !we;
-	wire stream =  oe &  we;
 
-	reg [AW-1:0] cnt;
+	reg [1:0] cnt;
 	reg [DW-1:0] data_tmp;
 	reg [DW-1:0] mem [DEPTH];
 
@@ -31,7 +30,7 @@ module jar_sram_top
 			//data_tmp <= 8'b0;
 		end
 		else if (write) begin
-			case(cnt[1:0])
+			case(cnt)
 				2'b00: begin
 					data_tmp[3:0] <= addr_data;
 					cnt <= cnt + 1;
@@ -50,11 +49,7 @@ module jar_sram_top
 		else if (read) begin
 			data_tmp <= mem[addr_data];
 		end
-		else if (stream) begin
-			data_tmp <= mem[cnt];
-			cnt <= cnt + 1;
-		end
 	end
 
-	assign io_out = (oe) ? data_tmp : 8'bz;
+	assign io_out = (read) ? data_tmp : 8'bz;
 endmodule
