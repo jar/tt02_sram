@@ -9,10 +9,10 @@ project:
 documentation: 
   author:       "James Ross"
   discord:      ""
-  title:        "SRAM"
-  description:  "Write to and Read from 16 addressable 8-bit words of memory"
-  how_it_works: "Write Enable (WEn) pin high while passing 4-bit address, 4 high bits and 4 low bit. While WEn low, 4-bit address returns 8-bit output"
-  how_to_test:  "after reset, you can write values into memory and read"
+  title:        "8x8 SRAM"
+  description:  "Write to and Read from 8 addressable 8-bit words of memory"
+  how_it_works: "Write Enable (WEn) pin high while passing 4-bits low data, 4-bits high data, and a 3-bit address. While WEn low, 3-bit address returns 8-bit output. The highest 4th bit of the address is ignored."
+  how_to_test:  "After reset, you can write values into memory and read"
   external_hw:  ""      # Describe any external hardware needed
   language:     "verilog"
   doc_link:     ""      # URL to longer form documentation, eg the README.md in your repository
