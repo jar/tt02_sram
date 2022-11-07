@@ -20,7 +20,8 @@ module jar_sram_top
 	wire write  = !oe &  we;
 	wire read   =  oe & !we;
 
-	reg [1:0] cnt;
+	reg lo;
+	reg hi;
 	reg [DW-1:0] data_tmp;
 	reg [DW-1:0] mem [DEPTH];
 
@@ -28,25 +29,23 @@ module jar_sram_top
 
 	always @(posedge clk) begin
 		if (rst) begin
-			cnt <= 0;
-			//data_tmp <= 8'b0;
+			lo <= 0;
+			hi <= 0;
 		end
 		else if (write) begin
-			case(cnt)
-				2'b00: begin
-					data_tmp[3:0] <= addr_data;
-					cnt <= cnt + 1;
-				end
-				2'b01: begin
-					data_tmp[7:4] <= addr_data;
-					cnt <= cnt + 1;
-				end
-				2'b10: begin
-					mem[addr] <= data_tmp;
-					cnt <= 0;
-				end
-				default:;
-			endcase
+			if (!lo) begin
+				data_tmp[3:0] <= addr_data;
+				lo <= 1;
+			end
+			else if (!hi) begin
+				data_tmp[7:4] <= addr_data;
+				hi <= 1;
+			end
+			else begin
+				mem[addr] <= data_tmp;
+				lo <= 0;
+				hi <= 0;
+			end
 		end
 		else if (read) begin
 			data_tmp <= mem[addr];
