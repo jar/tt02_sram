@@ -17,7 +17,7 @@ typedef struct {
 			uint8_t clk : 1;
 			uint8_t we  : 1;
 			uint8_t oe  : 1;
-			uint8_t unused : 1;
+			uint8_t commit : 1;
 			uint8_t addr_data : 4;
 		};
 	};
@@ -33,17 +33,18 @@ int main(int argc, char* argv[])
 	input_t* io_in = (input_t*)&(sram->io_in);
 
 	// Write Enable
-	io_in->we = 1;
 	for (uint8_t i = 0; i < DEPTH; i++) {
 		uint8_t val = 3*i;
+		io_in->we = 1;
 		io_in->addr_data = val & 0xf; // val.lo
 		ticktock();
 		io_in->addr_data = val >> 4; // val.hi
 		ticktock();
-		io_in->oe = 1; // commit is we = 1 & oe = 1
+		io_in->we = 0;
+		io_in->commit = 1; // commit is we = 1 & oe = 1
 		io_in->addr_data = i; // address
 		ticktock();
-		io_in->oe = 0;
+		io_in->commit = 0;
 	}
 	io_in->we = 0;
 
@@ -63,12 +64,13 @@ int main(int argc, char* argv[])
 	io_in->oe = 1;
 	io_in->addr_data = 0;
 	ticktock(); // now data_tmp loaded into internal register
-	io_in->we = 1;
+	io_in->oe = 0;
+	io_in->commit = 1;
 	for (uint8_t i = 1; i < DEPTH; i++) {
 		io_in->addr_data = i;
 		ticktock(); // commit
 	}
-	io_in->we = 0;
+	io_in->commit = 0;
 	// Checking values are zero'ed
 	io_in->oe = 1;
 	for (uint8_t i = 0; i < DEPTH; i++) {
