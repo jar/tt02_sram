@@ -37,5 +37,5 @@ module jar_sram_top
 		end
 	end
 
-	assign io_out = (read) ? data_tmp : 8'b0;
+	assign io_out = (read) ? data_tmp : 8'bz;
 endmodule
