@@ -10,29 +10,38 @@ module jar_sram_top
 );
 	// Shared address and data input.
 	// When writing, low data bits first, then high bits, then address
-	wire [AW-1:0] addr_data = io_in[DW-1:DW-AW];
-	wire             commit = io_in[3]; // Commit to memory
-	wire             oe     = io_in[2]; // Output Enable
-	wire             we     = io_in[1]; // Write Enable
 	wire             clk    = io_in[0]; // Clock
+	wire             we     = io_in[1]; // Write Enable
+	wire             oe     = io_in[2]; // Output Enable
+	wire             commit = io_in[3]; // Commit to memory
+	wire [AW-1:0] addr_data = io_in[DW-1:DW-AW];
+	wire         [2:0] addr = addr_data[2:0];
 
 	reg [DW-1:0] data_tmp;
 	reg [DW-1:0] mem [DEPTH];
+	reg [2:0] stream_index;
 
-	wire    [2:0] addr = addr_data[2:0];
-	wire [AW-1:0] data = addr_data[AW-1:0];
+	wire stream = we & oe;
+	wire reset = stream & commit;
 
 	always @(posedge clk) begin
-		if (we) begin
+		if (reset) begin
+			stream_index <= addr;
+		end
+		else if (stream) begin
+			data_tmp <= mem[stream_index];
+			stream_index <= stream_index + 1;
+		end
+		else if (we) begin
 			data_tmp <= {addr_data, data_tmp[DW-1:AW]};
 		end
-		if (commit) begin
-			mem[addr] <= data_tmp;
-		end
-		if (oe) begin
+		else if (oe) begin
 			data_tmp <= mem[addr];
+		end
+		else if (commit) begin
+			mem[addr] <= data_tmp;
 		end
 	end
 
-	assign io_out = (oe) ? data_tmp : 8'bz;
+	assign io_out = (oe) ? data_tmp : 8'b0000_000;
 endmodule

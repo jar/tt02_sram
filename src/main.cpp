@@ -60,6 +60,20 @@ int main(int argc, char* argv[])
 	}
 	io_in->oe = 0;
 
+	// Streaming
+	io_in->oe = io_in->we = io_in->commit = 1;
+	io_in->addr_data = 0; // set stream index
+	ticktock();
+	io_in->commit = 0;
+	for (uint8_t i = 0; i < DEPTH; i++) {
+		uint8_t val = 3*i;
+		tick();
+		printf("data[%2hhu] = %2hhu\n", i, sram->io_out);
+		if (sram->io_out != val) err = 1;
+		tock();
+	}
+	io_in->oe = io_in->we = 0;
+
 	// Testing Fast Zeroing (mem[0] already zero'ed)
 	io_in->oe = 1;
 	io_in->addr_data = 0;
