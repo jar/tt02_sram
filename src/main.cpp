@@ -4,7 +4,7 @@
 
 #define ADDRESS_WIDTH 4
 #define BITS 8
-#define DEPTH 16
+#define DEPTH 8
 
 #define tick() do{io_in->clk=1;sram->eval();}while(0)
 #define tock() do{io_in->clk=0;sram->eval();}while(0)
